@@ -42,6 +42,7 @@ return {
       require("nvim-treesitter").install(parsersToInstall)
     end
 
+    vim.treesitter.language.register("html", "htmlangular")
     -- 🔹 Enable highlighting + indent (your previous step)
     vim.api.nvim_create_autocmd("FileType", {
       callback = function()
