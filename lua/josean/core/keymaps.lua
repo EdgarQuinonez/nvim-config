@@ -26,7 +26,7 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
 
-vim.keymap.set("n", "<leader>cf", function()
+keymap.set("n", "<leader>cf", function()
   local path = vim.fn.expand("%")
   vim.fn.setreg("+", path)
   print("Copied: " .. path)
@@ -37,3 +37,62 @@ keymap.set("n", "<leader>cF", function()
   vim.fn.setreg("+", path)
   print("Copied: " .. path)
 end, { desc = "Copy absolute file path" })
+
+-- Copy current file's parent folder relative path
+keymap.set("n", "<leader>cp", function()
+  local current_file = vim.fn.expand("%")
+  local parent_folder = vim.fn.fnamemodify(current_file, ":h")
+  vim.fn.setreg("+", parent_folder)
+  print("Copied parent folder path: " .. parent_folder)
+end, { desc = "Copy parent folder relative path" })
+
+-- Create Angular component with --skip-test in current directory
+keymap.set("n", "<leader>ngc", function()
+  local current_dir = vim.fn.expand("%:p:h")
+  vim.ui.input({ prompt = "Component name: " }, function(component_name)
+    if component_name and component_name ~= "" then
+      local command = string.format("cd %s && ng g c %s --skip-tests", current_dir, component_name)
+      vim.fn.system(command)
+      if vim.v.shell_error == 0 then
+        print("Component created: " .. component_name)
+        vim.cmd("edit!") -- Refresh file explorer
+      else
+        print("Error creating component")
+      end
+    end
+  end)
+end, { desc = "Create Angular component (--skip-tests)" })
+
+-- Create Angular service in current directory
+keymap.set("n", "<leader>ngs", function()
+  local current_dir = vim.fn.expand("%:p:h")
+  vim.ui.input({ prompt = "Service name: " }, function(service_name)
+    if service_name and service_name ~= "" then
+      local command = string.format("cd %s && ng g s %s --skip-tests", current_dir, service_name)
+      vim.fn.system(command)
+      if vim.v.shell_error == 0 then
+        print("Service created: " .. service_name)
+        vim.cmd("edit!") -- Refresh file explorer
+      else
+        print("Error creating service")
+      end
+    end
+  end)
+end, { desc = "Create Angular service (--skip-tests)" })
+
+-- Generate routing module
+keymap.set("n", "<leader>ngr", function()
+  local current_dir = vim.fn.expand("%:p:h")
+  vim.ui.input({ prompt = "Routing module name (e.g., app, admin, feature): " }, function(routing_name)
+    if routing_name and routing_name ~= "" then
+      local command = string.format("cd %s && ng g m %s --routing", current_dir, routing_name)
+      vim.fn.system(command)
+      if vim.v.shell_error == 0 then
+        print("Routing module created: " .. routing_name)
+        vim.cmd("edit!") -- Refresh file explorer
+      else
+        print("Error creating routing module")
+      end
+    end
+  end)
+end, { desc = "Generate Angular routing module" })
