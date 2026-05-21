@@ -85,7 +85,7 @@ keymap.set("n", "<leader>ngr", function()
   local current_dir = vim.fn.expand("%:p:h")
   vim.ui.input({ prompt = "Routing module name (e.g., app, admin, feature): " }, function(routing_name)
     if routing_name and routing_name ~= "" then
-      local command = string.format("cd %s && ng g m %s --routing", current_dir, routing_name)
+      local command = string.format("cd %s && ng g m %s --routing --flat", current_dir, routing_name)
       vim.fn.system(command)
       if vim.v.shell_error == 0 then
         print("Routing module created: " .. routing_name)
