@@ -26,6 +26,18 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
 
+-- Search for visually selected text
+-- Visually select text, then type // to search for the next occurrence
+keymap.set("v", "//", function()
+  -- Yank the visually selected text into register "
+  vim.cmd("normal! y")
+  -- Get the yanked text
+  local selected = vim.fn.getreg('"')
+  -- Escape special characters and search
+  local escaped = vim.fn.escape(selected, "/\\")
+  vim.fn.execute("/\\V" .. escaped)
+end, { noremap = true })
+
 keymap.set("n", "<leader>cf", function()
   local path = vim.fn.expand("%")
   vim.fn.setreg("+", path)
