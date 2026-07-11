@@ -108,3 +108,21 @@ keymap.set("n", "<leader>ngr", function()
     end
   end)
 end, { desc = "Generate Angular routing module" })
+
+-- keymap.set("n", "<leader>zkm", function() end, { desc = "Pastes markdown frontmatter metadata" })
+keymap.set("n", "<leader>zkm", function()
+  local path = "templates/metadata.md"
+  local file = io.open(path, "r")
+  if not file then
+    vim.notify("metadata.md not found", vim.log.levels.WARN)
+    return
+  end
+  local content = file:read("*a")
+  file:close()
+
+  vim.cmd("normal! gg")
+  vim.fn.setreg("z", content)
+  vim.cmd('normal! "zP')
+
+  vim.notify("metadata.md pasted at top", vim.log.levels.INFO)
+end, { desc = "Pastes markdown frontmatter metadata at top" })
