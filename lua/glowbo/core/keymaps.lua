@@ -128,6 +128,14 @@ keymap.set("n", "<leader>zkm", function()
   vim.notify("metadata.md pasted at top", vim.log.levels.INFO)
 end, { desc = "Pastes markdown frontmatter metadata at top" })
 
+local function titleize(str)
+  local parts = vim.split(str, "[- ]")
+  for i, part in ipairs(parts) do
+    parts[i] = part:sub(1, 1):upper() .. part:sub(2)
+  end
+  return table.concat(parts, " ")
+end
+
 keymap.set("n", "<leader>zkn", function()
   local file = io.open(template_path, "r")
   if not file then
@@ -140,11 +148,14 @@ keymap.set("n", "<leader>zkn", function()
   local now = os.date("%d-%m-%Y %H:%M:%S")
   content = content:gsub("<DD%-MM%-YYYY HH:mm:ss>", now)
 
-  vim.ui.input({ prompt = "Note name (without extension): " }, function(note_name)
+  vim.ui.input({ prompt = "Note name: " }, function(note_name)
     if not note_name or note_name == "" then
       return
     end
-    local filename = note_name .. ".md"
+    -- Strip .md extension if provided
+    local name = note_name:gsub("%.md$", "")
+    local filename = name .. ".md"
+    content = content:gsub("<Note Name>", titleize(name))
     local note_file = io.open(filename, "w")
     if not note_file then
       vim.notify("Could not create file: " .. filename, vim.log.levels.ERROR)
