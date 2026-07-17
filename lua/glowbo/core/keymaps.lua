@@ -110,7 +110,7 @@ keymap.set("n", "<leader>ngr", function()
 end, { desc = "Generate Angular routing module" })
 
 -- Zettelkasten Keymaps
-local template_path = vim.fn.stdpath("config") .. "/templates/metadata.md"
+local template_path = "templates/metadata.md"
 
 keymap.set("n", "<leader>zkm", function()
   local file = io.open(template_path, "r")
