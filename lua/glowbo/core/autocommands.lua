@@ -16,6 +16,11 @@ vim.api.nvim_create_autocmd("BufWritePost", {
       return
     end
 
+    local relpath = vim.fn.expand("%")
+    if relpath == "templates/metadata.md" then
+      return
+    end
+
     local bufnr = vim.api.nvim_get_current_buf()
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
     local now = os.date("%d-%m-%Y %H:%M:%S")
