@@ -121,6 +121,9 @@ keymap.set("n", "<leader>zkm", function()
   local content = file:read("*a")
   file:close()
 
+  local now = os.date("%Y-%m-%dT%H:%M:%S")
+  content = content:gsub("<YYYY%-MM%-DDTHH:mm:ss>", now)
+
   vim.cmd("normal! gg")
   vim.fn.setreg("z", content)
   vim.cmd('normal! "zP')
@@ -145,8 +148,8 @@ keymap.set("n", "<leader>zkn", function()
   local content = file:read("*a")
   file:close()
 
-  local now = os.date("%d-%m-%Y %H:%M:%S")
-  content = content:gsub("<DD%-MM%-YYYY HH:mm:ss>", now)
+  local now = os.date("%Y-%m-%dT%H:%M:%S")
+  content = content:gsub("<YYYY%-MM%-DDTHH:mm:ss>", now)
 
   vim.ui.input({ prompt = "Note name: " }, function(note_name)
     if not note_name or note_name == "" then

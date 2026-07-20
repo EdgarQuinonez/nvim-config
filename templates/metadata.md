@@ -1,6 +1,6 @@
 ---
-date created: <DD-MM-YYYY HH:mm:ss>
-date modified: <DD-MM-YYYY HH:mm:ss>
+date created: <YYYY-MM-DDTHH:mm:ss>
+date modified: <YYYY-MM-DDTHH:mm:ss>
 tags: []
 status: draft
 type: fleeting

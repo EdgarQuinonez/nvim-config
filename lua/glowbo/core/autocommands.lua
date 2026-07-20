@@ -23,7 +23,7 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 
     local bufnr = vim.api.nvim_get_current_buf()
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    local now = os.date("%d-%m-%Y %H:%M:%S")
+    local now = os.date("%Y-%m-%dT%H:%M:%S")
     local in_frontmatter = false
 
     for i, line in ipairs(lines) do
