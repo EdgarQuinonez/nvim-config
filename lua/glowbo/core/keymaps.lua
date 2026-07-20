@@ -112,6 +112,14 @@ end, { desc = "Generate Angular routing module" })
 -- Zettelkasten Keymaps
 local template_path = "templates/metadata.md"
 
+local function titleize(str)
+  local parts = vim.split(str, "[- ]")
+  for i, part in ipairs(parts) do
+    parts[i] = part:sub(1, 1):upper() .. part:sub(2)
+  end
+  return table.concat(parts, " ")
+end
+
 keymap.set("n", "<leader>zkm", function()
   local file = io.open(template_path, "r")
   if not file then
@@ -125,20 +133,17 @@ keymap.set("n", "<leader>zkm", function()
   content = content:gsub("(date created: ).-\n", "%1" .. now .. "\n")
   content = content:gsub("(date modified: ).-\n", "%1" .. now .. "\n")
 
+  local name = vim.fn.expand("%:t:r")
+  if name and name ~= "" then
+    content = content:gsub("<Note Name>", titleize(name))
+  end
+
   vim.cmd("normal! gg")
   vim.fn.setreg("z", content)
   vim.cmd('normal! "zP')
 
   vim.notify("metadata.md pasted at top", vim.log.levels.INFO)
 end, { desc = "Pastes markdown frontmatter metadata at top" })
-
-local function titleize(str)
-  local parts = vim.split(str, "[- ]")
-  for i, part in ipairs(parts) do
-    parts[i] = part:sub(1, 1):upper() .. part:sub(2)
-  end
-  return table.concat(parts, " ")
-end
 
 keymap.set("n", "<leader>zkn", function()
   local file = io.open(template_path, "r")
