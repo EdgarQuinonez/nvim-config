@@ -15,3 +15,5 @@ vim.api.nvim_create_user_command("Wsync", function()
     vim.notify("Could not start wowsync — is it on PATH?", vim.log.levels.ERROR)
   end
 end, {})
+require("glowbo.core.init")
+require("glowbo.lazy")

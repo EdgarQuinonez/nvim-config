@@ -109,10 +109,19 @@ keymap.set("n", "<leader>ngr", function()
   end)
 end, { desc = "Generate Angular routing module" })
 
--- keymap.set("n", "<leader>zkm", function() end, { desc = "Pastes markdown frontmatter metadata" })
+-- Zettelkasten Keymaps
+local template_path = "templates/metadata.md"
+
+local function titleize(str)
+  local parts = vim.split(str, "[- ]")
+  for i, part in ipairs(parts) do
+    parts[i] = part:sub(1, 1):upper() .. part:sub(2)
+  end
+  return table.concat(parts, " ")
+end
+
 keymap.set("n", "<leader>zkm", function()
-  local path = "templates/metadata.md"
-  local file = io.open(path, "r")
+  local file = io.open(template_path, "r")
   if not file then
     vim.notify("metadata.md not found", vim.log.levels.WARN)
     return
@@ -120,9 +129,51 @@ keymap.set("n", "<leader>zkm", function()
   local content = file:read("*a")
   file:close()
 
+  local now = os.date("%Y-%m-%dT%H:%M:%S")
+  content = content:gsub("(date created: ).-\n", "%1" .. now .. "\n")
+  content = content:gsub("(date modified: ).-\n", "%1" .. now .. "\n")
+
+  local name = vim.fn.expand("%:t:r")
+  if name and name ~= "" then
+    content = content:gsub("<Note Name>", titleize(name))
+  end
+
   vim.cmd("normal! gg")
   vim.fn.setreg("z", content)
   vim.cmd('normal! "zP')
 
   vim.notify("metadata.md pasted at top", vim.log.levels.INFO)
 end, { desc = "Pastes markdown frontmatter metadata at top" })
+
+keymap.set("n", "<leader>zkn", function()
+  local file = io.open(template_path, "r")
+  if not file then
+    vim.notify("templates/metadata.md not found", vim.log.levels.WARN)
+    return
+  end
+  local content = file:read("*a")
+  file:close()
+
+  local now = os.date("%Y-%m-%dT%H:%M:%S")
+  content = content:gsub("(date created: ).-\n", "%1" .. now .. "\n")
+  content = content:gsub("(date modified: ).-\n", "%1" .. now .. "\n")
+
+  vim.ui.input({ prompt = "Note name: " }, function(note_name)
+    if not note_name or note_name == "" then
+      return
+    end
+    -- Strip .md extension if provided
+    local name = note_name:gsub("%.md$", "")
+    local filename = name .. ".md"
+    content = content:gsub("<Note Name>", titleize(name))
+    local note_file = io.open(filename, "w")
+    if not note_file then
+      vim.notify("Could not create file: " .. filename, vim.log.levels.ERROR)
+      return
+    end
+    note_file:write(content)
+    note_file:close()
+    vim.cmd("edit " .. filename)
+    vim.notify("Created note: " .. filename, vim.log.levels.INFO)
+  end)
+end, { desc = "Create new zettelkasten note from template" })
