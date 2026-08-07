@@ -1,2 +1,2 @@
-require("glowbo.core.init")
+require("glowbo.core")
 require("glowbo.lazy")
