@@ -177,3 +177,29 @@ keymap.set("n", "<leader>zkn", function()
     vim.notify("Created note: " .. filename, vim.log.levels.INFO)
   end)
 end, { desc = "Create new zettelkasten note from template" })
+
+local keymap = vim.keymap
+
+keymap.set("x", "<leader>sr", function()
+  local reg_save = vim.fn.getreginfo("z")
+
+  vim.cmd('normal! "zy')
+  local selection = vim.fn.getreg("z")
+
+  vim.fn.setreg("z", reg_save) -- don't clobber the user's register
+
+  -- \V (very nomagic): only "\" and the delimiter "/" are special,
+  -- so we don't have to maintain a manual list of "magic" chars
+  selection = vim.fn.escape(selection, [[\/]])
+  -- a literal newline can't live inside a single command-line;
+  -- turn it into the regex newline atom instead
+  selection = selection:gsub("\n", [[\n]])
+
+  local cmd = (":%%s/\\V%s//gc"):format(selection)
+  local left = vim.api.nvim_replace_termcodes("<Left><Left><Left>", true, false, true)
+
+  -- feed the command onto the cmdline WITHOUT executing it,
+  -- then step the cursor back between the empty // for you to fill in
+  vim.api.nvim_feedkeys(cmd, "n", false)
+  vim.api.nvim_feedkeys(left, "n", false)
+end, { desc = "Search & replace visual selection in file" })
