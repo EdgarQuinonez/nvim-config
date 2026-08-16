@@ -145,7 +145,9 @@ keymap.set("n", "<leader>zkm", function()
   vim.notify("metadata.md pasted at top", vim.log.levels.INFO)
 end, { desc = "Pastes markdown frontmatter metadata at top" })
 
-keymap.set("n", "<leader>zkn", function()
+-- Create a note from the metadata template
+-- opts: { dir = "", note_type = "", status = "" }
+local function create_note(opts)
   local file = io.open(template_path, "r")
   if not file then
     vim.notify("templates/metadata.md not found", vim.log.levels.WARN)
@@ -157,6 +159,10 @@ keymap.set("n", "<leader>zkn", function()
   local now = os.date("%Y-%m-%dT%H:%M:%S")
   content = content:gsub("(date created: ).-\n", "%1" .. now .. "\n")
   content = content:gsub("(date modified: ).-\n", "%1" .. now .. "\n")
+  content = content:gsub("(type:).-\n", "%1 " .. opts.note_type .. "\n")
+  if opts.status then
+    content = content:gsub("(status:).-\n", "%1 " .. opts.status .. "\n")
+  end
 
   vim.ui.input({ prompt = "Note name: " }, function(note_name)
     if not note_name or note_name == "" then
@@ -164,7 +170,9 @@ keymap.set("n", "<leader>zkn", function()
     end
     -- Strip .md extension if provided
     local name = note_name:gsub("%.md$", "")
-    local filename = name .. ".md"
+    local prefix = os.date("%Y-%m-%dT%H-%M-%S")
+    local dir = opts.dir ~= "" and opts.dir .. "/" or ""
+    local filename = dir .. prefix .. " " .. name .. ".md"
     content = content:gsub("<Note Name>", titleize(name))
     local note_file = io.open(filename, "w")
     if not note_file then
@@ -173,10 +181,22 @@ keymap.set("n", "<leader>zkn", function()
     end
     note_file:write(content)
     note_file:close()
-    vim.cmd("edit " .. filename)
+    vim.cmd("edit " .. vim.fn.fnameescape(filename))
     vim.notify("Created note: " .. filename, vim.log.levels.INFO)
   end)
-end, { desc = "Create new zettelkasten note from template" })
+end
+
+keymap.set("n", "<leader>zkn", function()
+  create_note({ dir = "", note_type = "fleeting" })
+end, { desc = "Create new fleeting note from template" })
+
+keymap.set("n", "<leader>zkl", function()
+  create_note({ dir = "reference", note_type = "reference", status = "draft" })
+end, { desc = "Create new reference note from template" })
+
+keymap.set("n", "<leader>zkh", function()
+  create_note({ dir = "daily notes", note_type = "daily" })
+end, { desc = "Create new daily note from template" })
 
 local keymap = vim.keymap
 
